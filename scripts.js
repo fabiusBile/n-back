@@ -282,9 +282,12 @@ class ViewModel {
 
     getRandomLetter() {
         let letter = this.letters[Math.floor(Math.random() * this.letters.length)];
-        var msg = new SpeechSynthesisUtterance(letter);
-        msg.lang = "ru-RU";
-        window.speechSynthesis.speak(msg);
+        // var msg = new SpeechSynthesisUtterance(letter);
+        // msg.lang = "ru-RU";
+        // window.speechSynthesis.speak(msg);
+
+        let audio = document.querySelector(`#letters #${letter}`);
+        audio.play();
         return letter;
     }
 
