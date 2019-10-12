@@ -52,6 +52,9 @@
         </div>
     </div>
     <form data-bind="if: !isTestStarted()">
+        <label>Имя тестируемого:</label>
+        <input type="text" required name="name">
+        <br>
         <h2>Вид теста:</h2>
         <label>Звуковой</label>
         <input name="audio" type="checkbox" checked>
@@ -71,6 +74,7 @@
         <input type="hidden" name="start" value="1">
     </form>
     <script src="knockout-3.5.0.js"></script>
+    <script src="jquery-3.4.1.min.js"></script>
     <script src="scripts.js"></script>
 </body>
 

@@ -68,6 +68,8 @@ const ChallengeType = Object.freeze({
     "Audio": "Audio"
 });
 
+const apiUrl = "https://script.google.com/macros/s/AKfycbwrSN7I4pSb91AIt5QNvmw_JpqovOsL3BqAygBwdPfrupSjlyM/exec";
+
 class ChallengeHandler {
     constructor(type, buttonText, comparer, handler) {
         this.type = type;
@@ -161,7 +163,7 @@ class ViewModel {
         var params = getAllUrlParams();
         this.delayInSeconds = 2 * 1000;
         this.isTestStarted = ko.observable(params.start != undefined);
-
+        this.userName = decodeURI(params.name);
 
         this.isVisual = params.visual != undefined;
         this.isAudio = params.audio != undefined;
@@ -217,7 +219,26 @@ class ViewModel {
     endTest() {
         clearInterval(this.loopId);
         alert("Тестирование завершено!");
+        this.sendResults();
         this.isTestStarted(false);
+    }
+
+    sendResults(){
+        var totalCount = this.results().length;
+        var succesCount = this.results().filter(r => r).length;
+        var failureCount = this.results().filter(r => !r).length;
+
+        var request = {
+            Name: "not implemented",
+            NLevel: this.grid.nLevel,
+            TestType: vm.handlers().map(e => e.button.text).join(", "),
+            SuccessCount: succesCount, 
+            FailureCount: failureCount, 
+            SuccessRate: succesCount/totalCount,
+            Name: this.userName
+        }
+
+        $.ajax({"url":apiUrl, method: "GET", dataType:"json", data:request});
     }
 
     doTestLoop(vm) {
