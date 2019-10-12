@@ -307,3 +307,10 @@ class ViewModel {
 
 var vm = new ViewModel();
 ko.applyBindings(vm);
+var lettersAudio = document.querySelectorAll("#letters audio");
+lettersAudio.forEach(e => {
+    var src = e.src;
+    e.removeAttribute("src");
+    e.play();
+    e.src = src;
+});
