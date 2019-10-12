@@ -1,0 +1,46 @@
+#n-back-table, #n-back-table td {
+    border: 1px solid black;
+}
+
+#n-back-table td {
+    padding: 30px;
+    transition: .5s;
+}
+
+#n-back-table td.active {
+    background: blue;
+}
+
+.test-container {
+    display: flex;
+}
+
+.test-container__right {
+    padding: 10px;
+}
+
+.test-buttons {
+    display: flex;
+    margin-top: 5px;
+}
+
+.test-button {
+    display: block;
+    flex: 1;
+    height: 80px;
+    background: white;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.test-button:active{
+    background: lightblue;
+}
+
+.test-button.success{
+    background: green;
+}
+
+.test-button.failure{
+    background: red;
+}

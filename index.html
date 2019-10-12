@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style.css">
+    <title>n-назад</title>
+</head>
+
+<body>
+    <div class="test-container">
+        <div class="test-container__left">
+            <table id="n-back-table" data-bind="with: grid">
+                <tbody>
+                    <!-- ko foreach:{data:  new Array(verticalCount), as: 'vert'} -->
+                    <tr data-bind="foreach:{data: new Array($parent.horizontalCount), as: 'hor' } ">
+                        <td data-bind="css:{
+                                active: (($parentContext.$index()*$parentContext.$parent.horizontalCount) + ($index()+1)) 
+                                == $parentContext.$parent.currentActiveCell().position
+                            }">
+                        </td>
+                    </tr>
+                    <!-- /ko -->
+                </tbody>
+            </table>
+            <div class="test-buttons" data-bind="if: true || isTestStarted()">
+                <!-- ko foreach: handlers -->
+                    <input data-bind="click: function(){$parent.buttonPressed($data)}, value: button.text, class: button.cssClass " type="button" class="test-button">
+                <!-- /ko -->
+            </div>
+        </div>
+        <div class="test-container__right">
+            <p data-bind="if: isTestStarted()">
+                <span>Раундов осталось:</span>
+                <span data-bind="text: roundsCount"></span>
+            </p>
+            <p>
+                <span>Результаты:</span>
+                <br>
+                <span data-bind="text: finalResult"></span>
+            </p>
+            <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem dolorem quidem mollitia. Quidem
+                quae magni, minus minima quas, harum autem odio iusto magnam rem animi cumque vero quos ipsam. Omnis!
+            </p>
+        </div>
+    </div>
+    <form data-bind="if: !isTestStarted()">
+        <h2>Вид теста:</h2>
+        <label>Звуковой</label>
+        <input name="audio" type="checkbox">
+        <br>
+        <label>Визуальный</label>
+        <input name="visual" type="checkbox">
+        <input type="submit" value="Начать тест">
+        <input type="hidden" name="start" value="1">
+    </form>
+    <script src="knockout-3.5.0.js"></script>
+    <script src="scripts.js"></script>
+</body>
+
+</html>
