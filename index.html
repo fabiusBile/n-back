@@ -32,6 +32,10 @@
             </div>
         </div>
         <div class="test-container__right">
+            <p>
+                <span>Значение n:</span>
+                <span data-bind="text: grid.nLevel"></span>
+            </p>
             <p data-bind="if: isTestStarted()">
                 <span>Раундов осталось:</span>
                 <span data-bind="text: roundsCount"></span>
@@ -54,6 +58,15 @@
         <br>
         <label>Визуальный</label>
         <input name="visual" type="checkbox" checked>
+        <br>
+        <label>Значение n:</label>
+        <select name="nlevel">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+        </select>
+        <br>
         <input type="submit" value="Начать тест">
         <input type="hidden" name="start" value="1">
     </form>
