@@ -92,7 +92,7 @@ class Button{
         this.isPressed = ko.observable(false);
         this.isSuccess= ko.observable(false);
         this.challengeType = challengeType;
-
+        
         var self = this;
         this.cssClass = ko.computed(() => {
             if (self.isPressed()){
@@ -150,6 +150,11 @@ class ViewModel {
         var params = getAllUrlParams();
         this.delayInSeconds = 2 * 1000;
         this.isTestStarted = ko.observable(params.start != undefined);
+
+        
+        this.isVisual = params.visual != undefined;
+        this.isAudio = params.audio != undefined;
+
         this.grid = new Grid(3, 3);
         this.roundsCount = ko.observable(this.maxRoundsCount);
         this.isButtonPressed = false;
@@ -178,19 +183,23 @@ class ViewModel {
         this.results([]);
         var self = this;
 
-        this.handlers.push(new ChallengeHandler(
-            ChallengeType.Visual,
-            "Позиция",
-            (current, previous) => current.position == previous.position,
-            (cell) => {cell.position = self.getRandomInt()}
-        ));
+        if (this.isVisual){
+            this.handlers.push(new ChallengeHandler(
+                ChallengeType.Visual,
+                "Позиция",
+                (current, previous) => current.position == previous.position,
+                (cell) => {cell.position = self.getRandomInt()}
+            ));
+        }
 
-        this.handlers.push(new ChallengeHandler(
-            ChallengeType.Audio,
-            "Звук",
-            (current, previous) => current.letter == previous.letter,
-            (cell) => {cell.letter = self.getRandomLetter()}
-        ));
+        if (this.isAudio){
+            this.handlers.push(new ChallengeHandler(
+                ChallengeType.Audio,
+                "Звук",
+                (current, previous) => current.letter == previous.letter,
+                (cell) => {cell.letter = self.getRandomLetter()}
+            ));
+        }
     }
 
     endTest() {
@@ -213,11 +222,11 @@ class ViewModel {
             vm.results.push(isAllSuccess);
         }
 
-
         if (vm.roundsCount() <= 0) {
             vm.endTest();
             return;
         }
+
         var newCell = new Cell();
 
         vm.handlers().forEach(h => {
