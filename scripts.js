@@ -173,7 +173,7 @@ class ViewModel {
         this.roundsCount = ko.observable(this.maxRoundsCount);
         this.isButtonPressed = false;
         this.handlers = ko.observableArray();
-        this.letters = ['а', "б", "в"];
+        this.letters = ['а', 'о', 'я', 'г', 'д', 'к', 'л', 'р', 'с', 'т', 'ц', 'м', 'н'];
         this.results = ko.observableArray([]);
 
         var self = this;
