@@ -63,6 +63,26 @@ function getAllUrlParams(url) {
     return obj;
 }
 
+function flattenObject(ob) {
+    var toReturn = {};
+
+    for (var i in ob) {
+        if (!ob.hasOwnProperty(i)) continue;
+
+        if ((typeof ob[i]) == 'object' && ob[i] !== null) {
+            var flatObject = flattenObject(ob[i]);
+            for (var x in flatObject) {
+                if (!flatObject.hasOwnProperty(x)) continue;
+
+                toReturn[i + '.' + x] = flatObject[x];
+            }
+        } else {
+            toReturn[i] = ob[i];
+        }
+    }
+    return toReturn;
+}
+
 const audioUrl = location.href.includes("github")
     ? "https://raw.githubusercontent.com/fabiusBile/n-back/master"
     : ".";
@@ -186,7 +206,7 @@ class ViewModel {
         this.handlers = ko.observableArray();
         this.letters = ['а', 'о', 'я', 'г', 'д', 'к', 'л', 'р', 'с', 'т', 'ц', 'м', 'н'];
         this.results = ko.observableArray([]);
-
+        this.detailedResults = ko.observableArray([]);
         var self = this;
         this.finalResult = ko.computed(() => {
             var totalCount = self.results().length;
@@ -200,6 +220,34 @@ class ViewModel {
             this.startTest();
         }
 
+    }
+
+    getDetailedStats(){
+        var stats = {};
+        var detailedStatsArray = this.detailedResults();
+        this.handlers().forEach(h => {
+            stats[h.type] = {};
+            stats[h.type].total = detailedStatsArray.filter(e => e[h.type] != null && e[h.type].isAppeared).length;
+            stats[h.type].error = detailedStatsArray.filter(e => e[h.type] != null && !e[h.type].isSuccess).length
+        });
+        var self = this;
+        stats.All = {};
+        stats.All.total = detailedStatsArray.filter(e => {
+            var isOk = false;
+            self.handlers().forEach(h =>{
+                isOk = isOk || (e[h.type] != null && e[h.type].isAppeared);
+            })
+            return isOk;
+        }).length;
+        stats.All.error = detailedStatsArray.filter(e => {
+            var isOk = false;
+            self.handlers().forEach(h =>{
+                isOk = isOk || (e[h.type] != null && !e[h.type].isSuccess);
+            })
+            return isOk;
+        }).length;
+
+        return stats;
     }
 
     startTest() {
@@ -250,21 +298,36 @@ class ViewModel {
             Name: this.userName()
         }
 
+        var detailed = flattenObject(vm.getDetailedStats())
+
+        Object.assign(request,detailed);
+
         $.ajax({ "url": apiUrl, method: "GET", dataType: "json", data: request });
     }
 
     doTestLoop(vm) {
         if (vm.grid.previousActiveCell() != null) {
             var isAllSuccess = true;
+            var detailedResult = {};
             vm.handlers().forEach(h => {
                 let isButtonPressed = h.button.isPressed();
                 let isHandlerSuccess = vm.isHandlerSuccess(h);
                 let isSuccess = isHandlerSuccess == isButtonPressed;
+
+                if (isButtonPressed || isHandlerSuccess){
+                    detailedResult[h.type] = {};
+                    detailedResult[h.type].isAppeared = isHandlerSuccess;
+                    detailedResult[h.type].isSuccess = isSuccess;
+                }
+
                 console.log(`${h.button.text}: ${isSuccess}`);
                 isAllSuccess = isAllSuccess && isSuccess;
             });
         
             vm.results.push(isAllSuccess);
+            if (Object.keys(detailedResult).length > 0){
+                vm.detailedResults.push(detailedResult);
+            }
         } 
 
         if (vm.roundsCount() <= 0) {
@@ -286,23 +349,26 @@ class ViewModel {
     }
 
     getRandomInt() {
-        var previousCell = this.grid.previousActiveCell();
+        var previousCell = this.grid.currentActiveCell();
 
-        if (previousCell != null && previousCell.position != null && this.isProbability(0.34)){
-            console.log('previous pos: '+ previousCell.position)
+        if (previousCell != null && previousCell.position != null && this.isProbability(0.25)){
+            console.log('previous pos: '+ previousCell.position);
+            window.previousCell = true;
             return previousCell.position;
         }  else {
+            window.previousCell = false;
             return 1 + Math.floor(Math.random() * Math.floor(this.grid.totalCount - 1));
         }
     }
 
     getRandomLetter() {
         var letter;
-        var previousCell = this.grid.previousActiveCell();
-        if (previousCell != null && previousCell.letter != null && this.isProbability(0.34)) {
+        var previousCell = this.grid.currentActiveCell();
+        if (previousCell != null && previousCell.letter != null && this.isProbability(0.25)) {
             letter = previousCell.letter;
             console.log('previous letter: '+ previousCell.letter)
         } else {
+            window.previousLetter = false;
             letter = this.letters[Math.floor(Math.random() * this.letters.length)];
         }
 
