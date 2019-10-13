@@ -63,9 +63,9 @@ function getAllUrlParams(url) {
     return obj;
 }
 
-const audioUrl = location.href.includes("github") 
-        ? "https://raw.githubusercontent.com/fabiusBile/n-back/master"
-        : ".";
+const audioUrl = location.href.includes("github")
+    ? "https://raw.githubusercontent.com/fabiusBile/n-back/master"
+    : ".";
 
 
 const ChallengeType = Object.freeze({
@@ -137,7 +137,7 @@ class Grid {
         this.totalCount = horizontalCount * verticalCount;
         this.horizontalCount = horizontalCount;
         this.verticalCount = verticalCount;
-        this.nLevel =  ko.observable(nLevel);
+        this.nLevel = ko.observable(nLevel);
         this.previousCells = [];
         this.currentActiveCell = ko.observable(new Cell());
     }
@@ -172,7 +172,7 @@ class ViewModel {
         this.isTestStarted = ko.observable(params.start != undefined);
         this.userName = ko.observable();
 
-        if (params.name){
+        if (params.name) {
             this.userName(decodeURI(params.name));
         }
 
@@ -236,7 +236,7 @@ class ViewModel {
         this.isTestStarted(false);
     }
 
-    sendResults(){
+    sendResults() {
         var totalCount = this.results().length;
         var succesCount = this.results().filter(r => r).length;
         var failureCount = this.results().filter(r => !r).length;
@@ -244,31 +244,28 @@ class ViewModel {
         var request = {
             NLevel: this.grid.nLevel,
             TestType: vm.handlers().map(e => e.button.text).join(", "),
-            SuccessCount: succesCount, 
-            FailureCount: failureCount, 
-            SuccessRate: succesCount/totalCount,
+            SuccessCount: succesCount,
+            FailureCount: failureCount,
+            SuccessRate: succesCount / totalCount,
             Name: this.userName()
         }
 
-        $.ajax({"url":apiUrl, method: "GET", dataType:"json", data:request});
+        $.ajax({ "url": apiUrl, method: "GET", dataType: "json", data: request });
     }
 
     doTestLoop(vm) {
         if (vm.grid.previousActiveCell() != null) {
             var isAllSuccess = true;
-
             vm.handlers().forEach(h => {
                 let isButtonPressed = h.button.isPressed();
-                let isHandlerSuccess =vm.isHandlerSuccess(h);
-                let isSuccess =  isHandlerSuccess == isButtonPressed;
+                let isHandlerSuccess = vm.isHandlerSuccess(h);
+                let isSuccess = isHandlerSuccess == isButtonPressed;
                 console.log(`${h.button.text}: ${isSuccess}`);
                 isAllSuccess = isAllSuccess && isSuccess;
             });
-            console.log(isAllSuccess);
+        
             vm.results.push(isAllSuccess);
-        } else {
-            vm.results.push(true);
-        }
+        } 
 
         if (vm.roundsCount() <= 0) {
             vm.endTest();
@@ -289,20 +286,35 @@ class ViewModel {
     }
 
     getRandomInt() {
-        return 1 + Math.floor(Math.random() * Math.floor(this.grid.totalCount - 1));
+        var previousCell = this.grid.previousActiveCell();
+
+        if (previousCell != null && previousCell.position != null && this.isProbability(0.34)){
+            console.log('previous pos: '+ previousCell.position)
+            return previousCell.position;
+        }  else {
+            return 1 + Math.floor(Math.random() * Math.floor(this.grid.totalCount - 1));
+        }
     }
 
     getRandomLetter() {
-        let letter = this.letters[Math.floor(Math.random() * this.letters.length)];
-        // var msg = new SpeechSynthesisUtterance(letter);
-        // msg.lang = "ru-RU";
-        // window.speechSynthesis.speak(msg);
-        
-        audio.src =  `${audioUrl}/audio/${letter}.mp3`;
+        var letter;
+        var previousCell = this.grid.previousActiveCell();
+        if (previousCell != null && previousCell.letter != null && this.isProbability(0.34)) {
+            letter = previousCell.letter;
+            console.log('previous letter: '+ previousCell.letter)
+        } else {
+            letter = this.letters[Math.floor(Math.random() * this.letters.length)];
+        }
+
+        audio.src = `${audioUrl}/audio/${letter}.mp3`;
         audio.play();
         // let audio = document.querySelector(`#letters #${letter}`);
         // audio.play();
         return letter;
+    }
+
+    isProbability(probability) {
+        return Math.random() <= probability;
     }
 
     isHandlerSuccess(handler) {
