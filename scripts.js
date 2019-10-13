@@ -162,11 +162,25 @@ class Grid {
         this.currentActiveCell = ko.observable(new Cell());
     }
 
+    nextPreviousCell(){
+        if (this.nLevel() == 1){
+            return this.currentActiveCell();
+        }
+
+        if (this.previousCells.length < this.nLevel()){
+            return null;
+        } 
+
+        return this.previousCells[1];
+    }
+
     previousActiveCell() {
         return this.previousCells.length < this.nLevel()
             ? null
             : this.previousCells[0];
     }
+
+
 
     updateCell(newCell) {
         if (this.previousCells.length >= this.nLevel()) {
@@ -282,6 +296,8 @@ class ViewModel {
         alert("Тестирование завершено!");
         this.sendResults();
         this.isTestStarted(false);
+        this.results([]);
+        this.detailedResults([]);
     }
 
     sendResults() {
@@ -349,7 +365,7 @@ class ViewModel {
     }
 
     getRandomInt() {
-        var previousCell = this.grid.currentActiveCell();
+        var previousCell = this.grid.nextPreviousCell();
 
         if (previousCell != null && previousCell.position != null && this.isProbability(0.25)){
             console.log('previous pos: '+ previousCell.position);
@@ -357,19 +373,22 @@ class ViewModel {
             return previousCell.position;
         }  else {
             window.previousCell = false;
-            return 1 + Math.floor(Math.random() * Math.floor(this.grid.totalCount - 1));
+            let newPos = 1 + Math.floor(Math.random() * Math.floor(this.grid.totalCount - 1));
+            console.log('new pos: '+ newPos);
+            return newPos;
         }
     }
 
     getRandomLetter() {
         var letter;
-        var previousCell = this.grid.currentActiveCell();
+        var previousCell = this.grid.nextPreviousCell();
         if (previousCell != null && previousCell.letter != null && this.isProbability(0.25)) {
             letter = previousCell.letter;
             console.log('previous letter: '+ previousCell.letter)
         } else {
             window.previousLetter = false;
             letter = this.letters[Math.floor(Math.random() * this.letters.length)];
+            console.log('new letter: '+ letter)
         }
 
         audio.src = `${audioUrl}/audio/${letter}.mp3`;
