@@ -11,7 +11,7 @@
 
 <body>
     <div id="letters" data-bind="foreach: letters">
-        <audio preload="auto"  data-bind="attr:{src: 'audio/'+$data+'.mp3', id: $data}" />
+        <audio preload="auto" data-bind="attr:{src: 'audio/'+$data+'.mp3', id: $data}" />
     </div>
     <div class="test-container">
         <div class="test-container__left">
@@ -56,24 +56,24 @@
     </div>
     <form data-bind="if: !isTestStarted()">
         <label>Имя тестируемого:</label>
-        <input type="text" required name="name">
+        <input type="text" data-bind="value: userName" required name="name">
         <br>
         <h2>Вид теста:</h2>
         <label>Звуковой</label>
-        <input name="audio" type="checkbox" checked>
+        <input name="audio" type="checkbox" data-bind="checked: isAudio">
         <br>
         <label>Визуальный</label>
-        <input name="visual" type="checkbox" checked>
+        <input name="visual" type="checkbox" data-bind="checked: isVisual">
         <br>
         <label>Значение n:</label>
-        <select name="nlevel">
+        <select name="nlevel" data-bind="value: grid.nLevel">
             <option>1</option>
             <option>2</option>
             <option>3</option>
             <option>4</option>
         </select>
         <br>
-        <input type="submit" value="Начать тест">
+        <input type="button" id="start" data-bind="click: startTest" value="Начать тест">
         <input type="hidden" name="start" value="1">
     </form>
     <script src="knockout-3.5.0.js"></script>

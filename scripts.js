@@ -68,6 +68,8 @@ const ChallengeType = Object.freeze({
     "Audio": "Audio"
 });
 
+const audio = new Audio();
+
 const apiUrl = "https://script.google.com/macros/s/AKfycbwrSN7I4pSb91AIt5QNvmw_JpqovOsL3BqAygBwdPfrupSjlyM/exec";
 
 class ChallengeHandler {
@@ -130,19 +132,19 @@ class Grid {
         this.totalCount = horizontalCount * verticalCount;
         this.horizontalCount = horizontalCount;
         this.verticalCount = verticalCount;
-        this.nLevel =  nLevel;
+        this.nLevel =  ko.observable(nLevel);
         this.previousCells = [];
         this.currentActiveCell = ko.observable(new Cell());
     }
 
     previousActiveCell() {
-        return this.previousCells.length < this.nLevel
+        return this.previousCells.length < this.nLevel()
             ? null
             : this.previousCells[0];
     }
 
     updateCell(newCell) {
-        if (this.previousCells.length >= this.nLevel) {
+        if (this.previousCells.length >= this.nLevel()) {
             this.previousCells.shift();
         }
         this.previousCells.push(this.currentActiveCell());
@@ -163,10 +165,14 @@ class ViewModel {
         var params = getAllUrlParams();
         this.delayInSeconds = 2 * 1000;
         this.isTestStarted = ko.observable(params.start != undefined);
-        this.userName = decodeURI(params.name);
+        this.userName = ko.observable();
 
-        this.isVisual = params.visual != undefined;
-        this.isAudio = params.audio != undefined;
+        if (params.name){
+            this.userName(decodeURI(params.name));
+        }
+
+        this.isVisual = ko.observable(params.visual != undefined);
+        this.isAudio = ko.observable(params.audio != undefined);
         var nLevel = Number(params.nlevel) || 1;
 
         this.grid = new Grid(3, 3, nLevel);
@@ -192,12 +198,14 @@ class ViewModel {
     }
 
     startTest() {
+        this.isTestStarted(true);
         this.loopId = setInterval(() => this.doTestLoop(this), this.delayInSeconds);
         this.handlers([]);
         this.results([]);
+        this.roundsCount(this.maxRoundsCount);
         var self = this;
-
-        if (this.isVisual) {
+        audio.play();
+        if (this.isVisual()) {
             this.handlers.push(new ChallengeHandler(
                 ChallengeType.Visual,
                 "Позиция",
@@ -206,7 +214,7 @@ class ViewModel {
             ));
         }
 
-        if (this.isAudio) {
+        if (this.isAudio()) {
             this.handlers.push(new ChallengeHandler(
                 ChallengeType.Audio,
                 "Звук",
@@ -229,13 +237,12 @@ class ViewModel {
         var failureCount = this.results().filter(r => !r).length;
 
         var request = {
-            Name: "not implemented",
             NLevel: this.grid.nLevel,
             TestType: vm.handlers().map(e => e.button.text).join(", "),
             SuccessCount: succesCount, 
             FailureCount: failureCount, 
             SuccessRate: succesCount/totalCount,
-            Name: this.userName
+            Name: this.userName()
         }
 
         $.ajax({"url":apiUrl, method: "GET", dataType:"json", data:request});
@@ -285,9 +292,11 @@ class ViewModel {
         // var msg = new SpeechSynthesisUtterance(letter);
         // msg.lang = "ru-RU";
         // window.speechSynthesis.speak(msg);
-
-        let audio = document.querySelector(`#letters #${letter}`);
+        
+        audio.src = `/audio/${letter}.mp3`;
         audio.play();
+        // let audio = document.querySelector(`#letters #${letter}`);
+        // audio.play();
         return letter;
     }
 
@@ -307,10 +316,3 @@ class ViewModel {
 
 var vm = new ViewModel();
 ko.applyBindings(vm);
-var lettersAudio = document.querySelectorAll("#letters audio");
-lettersAudio.forEach(e => {
-    var src = e.src;
-    e.removeAttribute("src");
-    e.play();
-    e.src = src;
-});
