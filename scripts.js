@@ -293,7 +293,7 @@ class ViewModel {
         // msg.lang = "ru-RU";
         // window.speechSynthesis.speak(msg);
         
-        audio.src = `/audio/${letter}.mp3`;
+        audio.src = `./audio/${letter}.mp3`;
         audio.play();
         // let audio = document.querySelector(`#letters #${letter}`);
         // audio.play();
