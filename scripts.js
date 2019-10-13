@@ -63,6 +63,11 @@ function getAllUrlParams(url) {
     return obj;
 }
 
+const audioUrl = location.href.includes("github") 
+        ? "https://raw.githubusercontent.com/fabiusBile/n-back/master"
+        : ".";
+
+
 const ChallengeType = Object.freeze({
     "Visual": "Visual",
     "Audio": "Audio"
@@ -293,7 +298,7 @@ class ViewModel {
         // msg.lang = "ru-RU";
         // window.speechSynthesis.speak(msg);
         
-        audio.src = `./audio/${letter}.mp3`;
+        audio.src =  `${audioUrl}/audio/${letter}.mp3`;
         audio.play();
         // let audio = document.querySelector(`#letters #${letter}`);
         // audio.play();
