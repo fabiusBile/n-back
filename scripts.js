@@ -87,6 +87,12 @@ const audioUrl = location.href.includes("github")
     ? "https://raw.githubusercontent.com/fabiusBile/n-back/master"
     : ".";
 
+const roundCountsByN = Object.freeze({
+    1:21,
+    2:24,
+    3:29,
+    4:36
+});
 
 const ChallengeType = Object.freeze({
     "Visual": "Visual",
@@ -193,14 +199,12 @@ class Grid {
             self.currentActiveCell(newCell);
         }, 500)
     }
-
-
 }
 
 class ViewModel {
 
     constructor() {
-        this.maxRoundsCount = 21;
+
         var params = getAllUrlParams();
         this.delayInSeconds = 2 * 1000;
         this.isTestStarted = ko.observable(params.start != undefined);
@@ -212,10 +216,11 @@ class ViewModel {
 
         this.isVisual = ko.observable(params.visual != undefined);
         this.isAudio = ko.observable(params.audio != undefined);
+
         var nLevel = Number(params.nlevel) || 1;
 
         this.grid = new Grid(3, 3, nLevel);
-        this.roundsCount = ko.observable(this.maxRoundsCount);
+        this.roundsCount = ko.observable(roundCountsByN[nLevel]);
         this.isButtonPressed = false;
         this.handlers = ko.observableArray();
         this.letters = ['а', 'о', 'я', 'г', 'д', 'к', 'л', 'р', 'с', 'т', 'ц', 'м', 'н'];
@@ -269,7 +274,7 @@ class ViewModel {
         this.loopId = setInterval(() => this.doTestLoop(this), this.delayInSeconds);
         this.handlers([]);
         this.results([]);
-        this.roundsCount(this.maxRoundsCount);
+        this.roundsCount(roundCountsByN[this.grid.nLevel()]);
         var self = this;
         audio.play();
         if (this.isVisual()) {
