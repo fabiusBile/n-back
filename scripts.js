@@ -206,7 +206,7 @@ class ViewModel {
     constructor() {
 
         var params = getAllUrlParams();
-        this.delayInSeconds = 2 * 1000;
+        this.delayInSeconds = 3 * 1000;
         this.isTestStarted = ko.observable(params.start != undefined);
         this.userName = ko.observable();
 
