@@ -94,6 +94,11 @@ const roundCountsByN = Object.freeze({
     4:36
 });
 
+const lettersByIsVisual = Object.freeze({
+    true: ['а', 'о', 'я', 'г', 'д', 'к', 'л', 'р', 'с', 'т', 'ц', 'м', 'н'],
+    false: ['г', 'д', 'к', 'л', 'с', 'т', 'м', 'н']
+});
+
 const ChallengeType = Object.freeze({
     "Visual": "Visual",
     "Audio": "Audio"
@@ -223,7 +228,10 @@ class ViewModel {
         this.roundsCount = ko.observable(roundCountsByN[nLevel]);
         this.isButtonPressed = false;
         this.handlers = ko.observableArray();
-        this.letters = ['г', 'д', 'к', 'л', 'с', 'т', 'м', 'н'];
+        
+        this.letters = lettersByIsVisual[this.isVisual()];
+
+
         this.results = ko.observableArray([]);
         this.detailedResults = ko.observableArray([]);
         var self = this;
@@ -275,6 +283,8 @@ class ViewModel {
         this.handlers([]);
         this.results([]);
         this.roundsCount(roundCountsByN[this.grid.nLevel()]);
+        this.letters = lettersByIsVisual[this.isVisual()];
+
         var self = this;
         audio.play();
         if (this.isVisual()) {
