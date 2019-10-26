@@ -17,6 +17,7 @@
 
 .test-container__right {
     padding: 10px;
+    flex-shrink: 0;
 }
 
 .test-buttons {
