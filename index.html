@@ -30,9 +30,33 @@
             </table>
             <div class="test-buttons" data-bind="if: true || isTestStarted()">
                 <!-- ko foreach: handlers -->
-                    <input data-bind="click: function(){$parent.buttonPressed($data)}, value: button.text, class: button.cssClass " type="button" class="test-button">
+                <input
+                    data-bind="click: function(){$parent.buttonPressed($data)}, value: button.text, class: button.cssClass "
+                    type="button" class="test-button">
                 <!-- /ko -->
             </div>
+            <form data-bind="if: !isTestStarted()">
+                <label>Имя тестируемого:</label>
+                <input type="text" data-bind="value: userName" required name="name">
+                <br>
+                <h2>Вид теста:</h2>
+                <label>Звуковой</label>
+                <input name="audio" type="checkbox" data-bind="checked: isAudio">
+                <br>
+                <label>Визуальный</label>
+                <input name="visual" type="checkbox" data-bind="checked: isVisual">
+                <br>
+                <label>Значение n:</label>
+                <select name="nlevel" data-bind="value: grid.nLevel">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                </select>
+                <br>
+                <input type="button" id="start" data-bind="click: startTest" value="Начать тест">
+                <input type="hidden" name="start" value="1">
+            </form>
         </div>
         <div class="test-container__right">
             <p>
@@ -51,40 +75,28 @@
         </div>
         <div class="test-container__right-2">
             <p>
-                Ваша задача состоит в том, чтобы указать, при помощи нажатия кнопок, 
+                Ваша задача состоит в том, чтобы указать, при помощи нажатия кнопок,
                 совпадают ли произнесенная буква и подсвеченная ячейка с тем, что показывалось
-                1 позицию назад (1 уровень), 
-                2 позиции назад (2 уровень), 
-                или 3 позиции назад (3 уровень), 
-                и так далее. Всего 4 уровня. 
+                1 позицию назад (1 уровень),
+                2 позиции назад (2 уровень),
+                или 3 позиции назад (3 уровень),
+                и так далее. Всего 4 уровня.
                 <br>
                 Если совпадает и буква, и ячейка, нажимаете на обе кнопки (желательно, как можно быстрее).
                 Один раз проходите каждый уровень для тренировки, второй раз уже контрольный.
             </p>
+            <details>
+                <summary>
+                    Видео с примером прохождения теста
+                </summary>
+                <br>
+                <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/AODXvydZpaQ"
+                    frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+            </details>
         </div>
     </div>
-    <form data-bind="if: !isTestStarted()">
-        <label>Имя тестируемого:</label>
-        <input type="text" data-bind="value: userName" required name="name">
-        <br>
-        <h2>Вид теста:</h2>
-        <label>Звуковой</label>
-        <input name="audio" type="checkbox" data-bind="checked: isAudio">
-        <br>
-        <label>Визуальный</label>
-        <input name="visual" type="checkbox" data-bind="checked: isVisual">
-        <br>
-        <label>Значение n:</label>
-        <select name="nlevel" data-bind="value: grid.nLevel">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-        </select>
-        <br>
-        <input type="button" id="start" data-bind="click: startTest" value="Начать тест">
-        <input type="hidden" name="start" value="1">
-    </form>
+
     <script src="knockout-3.5.0.js"></script>
     <script src="jquery-3.4.1.min.js"></script>
     <script src="scripts.js"></script>

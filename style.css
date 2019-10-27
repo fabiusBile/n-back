@@ -46,3 +46,8 @@
 .test-button.failure{
     background: red;
 }
+
+summary{
+    cursor: pointer;
+    color: darkblue;
+}
