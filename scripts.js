@@ -88,10 +88,10 @@ const audioUrl = location.href.includes("github")
     : ".";
 
 const roundCountsByN = Object.freeze({
-    1:21,
-    2:24,
-    3:29,
-    4:36
+    1: 21,
+    2: 24,
+    3: 29,
+    4: 36
 });
 
 const lettersByIsVisual = Object.freeze({
@@ -173,14 +173,14 @@ class Grid {
         this.currentActiveCell = ko.observable(new Cell());
     }
 
-    nextPreviousCell(){
-        if (this.nLevel() == 1){
+    nextPreviousCell() {
+        if (this.nLevel() == 1) {
             return this.currentActiveCell();
         }
 
-        if (this.previousCells.length < this.nLevel()){
+        if (this.previousCells.length < this.nLevel()) {
             return null;
-        } 
+        }
 
         return this.previousCells[1];
     }
@@ -228,7 +228,7 @@ class ViewModel {
         this.roundsCount = ko.observable(roundCountsByN[nLevel]);
         this.isButtonPressed = false;
         this.handlers = ko.observableArray();
-        
+
         this.letters = lettersByIsVisual[this.isVisual()];
 
 
@@ -249,7 +249,7 @@ class ViewModel {
 
     }
 
-    getDetailedStats(){
+    getDetailedStats() {
         var stats = {};
         var detailedStatsArray = this.detailedResults();
         this.handlers().forEach(h => {
@@ -261,14 +261,14 @@ class ViewModel {
         stats.All = {};
         stats.All.total = detailedStatsArray.filter(e => {
             var isOk = false;
-            self.handlers().forEach(h =>{
+            self.handlers().forEach(h => {
                 isOk = isOk || (e[h.type] != null && e[h.type].isAppeared);
             })
             return isOk;
         }).length;
         stats.All.error = detailedStatsArray.filter(e => {
             var isOk = false;
-            self.handlers().forEach(h =>{
+            self.handlers().forEach(h => {
                 isOk = isOk || (e[h.type] != null && !e[h.type].isSuccess);
             })
             return isOk;
@@ -278,31 +278,33 @@ class ViewModel {
     }
 
     startTest() {
-        this.isTestStarted(true);
-        this.loopId = setInterval(() => this.doTestLoop(this), this.delayInSeconds);
-        this.handlers([]);
-        this.results([]);
-        this.roundsCount(roundCountsByN[this.grid.nLevel()]);
-        this.letters = lettersByIsVisual[this.isVisual()];
+        if (document.querySelector("form").reportValidity()) {
+            this.isTestStarted(true);
+            this.loopId = setInterval(() => this.doTestLoop(this), this.delayInSeconds);
+            this.handlers([]);
+            this.results([]);
+            this.roundsCount(roundCountsByN[this.grid.nLevel()]);
+            this.letters = lettersByIsVisual[this.isVisual()];
 
-        var self = this;
-        audio.play();
-        if (this.isVisual()) {
-            this.handlers.push(new ChallengeHandler(
-                ChallengeType.Visual,
-                "Позиция",
-                (current, previous) => current.position == previous.position,
-                (cell) => { cell.position = self.getRandomInt() }
-            ));
-        }
+            var self = this;
+            audio.play();
+            if (this.isVisual()) {
+                this.handlers.push(new ChallengeHandler(
+                    ChallengeType.Visual,
+                    "Позиция",
+                    (current, previous) => current.position == previous.position,
+                    (cell) => { cell.position = self.getRandomInt() }
+                ));
+            }
 
-        if (this.isAudio()) {
-            this.handlers.push(new ChallengeHandler(
-                ChallengeType.Audio,
-                "Звук",
-                (current, previous) => current.letter == previous.letter,
-                (cell) => { cell.letter = self.getRandomLetter() }
-            ));
+            if (this.isAudio()) {
+                this.handlers.push(new ChallengeHandler(
+                    ChallengeType.Audio,
+                    "Звук",
+                    (current, previous) => current.letter == previous.letter,
+                    (cell) => { cell.letter = self.getRandomLetter() }
+                ));
+            }
         }
     }
 
@@ -331,7 +333,7 @@ class ViewModel {
 
         var detailed = flattenObject(vm.getDetailedStats())
 
-        Object.assign(request,detailed);
+        Object.assign(request, detailed);
 
         $.ajax({ "url": apiUrl, method: "GET", dataType: "json", data: request });
     }
@@ -345,7 +347,7 @@ class ViewModel {
                 let isHandlerSuccess = vm.isHandlerSuccess(h);
                 let isSuccess = isHandlerSuccess == isButtonPressed;
 
-                if (isButtonPressed || isHandlerSuccess){
+                if (isButtonPressed || isHandlerSuccess) {
                     detailedResult[h.type] = {};
                     detailedResult[h.type].isAppeared = isHandlerSuccess;
                     detailedResult[h.type].isSuccess = isSuccess;
@@ -354,12 +356,12 @@ class ViewModel {
                 console.log(`${h.button.text}: ${isSuccess}`);
                 isAllSuccess = isAllSuccess && isSuccess;
             });
-        
+
             vm.results.push(isAllSuccess);
-            if (Object.keys(detailedResult).length > 0){
+            if (Object.keys(detailedResult).length > 0) {
                 vm.detailedResults.push(detailedResult);
             }
-        } 
+        }
 
         if (vm.roundsCount() <= 0) {
             vm.endTest();
@@ -382,14 +384,14 @@ class ViewModel {
     getRandomInt() {
         var previousCell = this.grid.nextPreviousCell();
 
-        if (previousCell != null && previousCell.position != null && this.isProbability(0.25)){
-            console.log('previous pos: '+ previousCell.position);
+        if (previousCell != null && previousCell.position != null && this.isProbability(0.25)) {
+            console.log('previous pos: ' + previousCell.position);
             window.previousCell = true;
             return previousCell.position;
-        }  else {
+        } else {
             window.previousCell = false;
             let newPos = 1 + Math.floor(Math.random() * Math.floor(this.grid.totalCount - 1));
-            console.log('new pos: '+ newPos);
+            console.log('new pos: ' + newPos);
             return newPos;
         }
     }
@@ -399,11 +401,11 @@ class ViewModel {
         var previousCell = this.grid.nextPreviousCell();
         if (previousCell != null && previousCell.letter != null && this.isProbability(0.25)) {
             letter = previousCell.letter;
-            console.log('previous letter: '+ previousCell.letter)
+            console.log('previous letter: ' + previousCell.letter)
         } else {
             window.previousLetter = false;
             letter = this.letters[Math.floor(Math.random() * this.letters.length)];
-            console.log('new letter: '+ letter)
+            console.log('new letter: ' + letter)
         }
 
         audio.src = `${audioUrl}/audio/${letter}.mp3`;
